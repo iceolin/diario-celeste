@@ -20,7 +20,6 @@
     <main>
         <section id="cadastro">
             <h2>Registrar Nova Partida</h2>
-            <!-- Formulário com os campos da nossa entidade principal -->
             <form action="#" method="POST">
                 <div>
                     <label for="dataJogo">Data do Jogo:</label>
@@ -32,8 +31,10 @@
                         <option value="">Selecione...</option>
                         <option value="Brasileirao">Brasileirão Série A</option>
                         <option value="CopaDoBrasil">Copa do Brasil</option>
-                        <option value="SulAmericana">Copa Sul-Americana</option>
+                        <option value="Libertadores">Copa Libertadores</option>
+                        <option value="Sulamericana">Copa Sulamericana</option>
                         <option value="Mineiro">Campeonato Mineiro</option>
+                        <option value="Amistoso">Amistoso</option>
                     </select>
                 </div>
                 <div>
@@ -66,6 +67,56 @@
                 </div>
                 <button type="submit">Salvar Partida</button>
             </form>
+        </section>
+        <hr>
+
+        <section id="controles">
+            <h2>Histórico de Jogos</h2>
+            <div>
+                <label for="pesquisa">Pesquisar Adversário:</label>
+                <input type="search" id="pesquisa" placeholder="Ex: Boca Juniors">
+                <button type="button">Buscar</button>
+            </div>
+            <div>
+                <label for="filtroCampeonato">Filtrar por Campeonato:</label>
+                <select id="filtroCampeonato">
+                    <option value="todos">Todos</option>
+                    <option value="Brasileirao">Brasileirão Série A</option>
+                    <option value="Libertadores">Copa Libertadores</option>
+                    <option value="Sulamericana">Copa Sulamericana</option>
+                </select>
+            </div>
+            <div>
+                <label for="ordenacao">Ordenar por:</label>
+                <select id="ordenacao">
+                    <option value="recentes">Mais recentes</option>
+                    <option value="antigos">Mais antigos</option>
+                </select>
+            </div>
+        </section>
+
+        <section id="listagem">
+            <article>
+                <h3>Cruzeiro 3 x 0 Botafogo</h3>
+                <p><strong>Data:</strong> 14/04/2026</p>
+                <p><strong>Campeonato:</strong> Brasileirão Série A</p>
+                <p><strong>Resultado:</strong> Vitória</p>
+                
+                <button type="button">Ver detalhes</button>
+                <button type="button">Editar</button>
+                <button type="button">Excluir</button>
+            </article>
+
+            <article>
+                <h3>Cruzeiro 2 x 1 Boca Juniors</h3>
+                <p><strong>Data:</strong> 22/08/2026</p>
+                <p><strong>Campeonato:</strong> Copa Libertadores</p>
+                <p><strong>Resultado:</strong> Vitória</p>
+                
+                <button type="button">Ver detalhes</button>
+                <button type="button">Editar</button>
+                <button type="button">Excluir</button>
+            </article>
         </section>
     </main>
 
