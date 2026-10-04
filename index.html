@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário Celeste</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Diário Celeste</h1>
+        <nav>
+            <ul>
+                <li><a href="#cadastro">Registrar Partida</a></li>
+                <li><a href="#listagem">Histórico de Jogos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="cadastro">
+            <h2>Registrar Nova Partida</h2>
+            <!-- Formulário com os campos da nossa entidade principal -->
+            <form action="#" method="POST">
+                <div>
+                    <label for="dataJogo">Data do Jogo:</label>
+                    <input type="date" id="dataJogo" name="dataJogo" required>
+                </div>
+                <div>
+                    <label for="campeonato">Campeonato:</label>
+                    <select id="campeonato" name="campeonato" required>
+                        <option value="">Selecione...</option>
+                        <option value="Brasileirao">Brasileirão Série A</option>
+                        <option value="CopaDoBrasil">Copa do Brasil</option>
+                        <option value="SulAmericana">Copa Sul-Americana</option>
+                        <option value="Mineiro">Campeonato Mineiro</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="adversario">Time Adversário:</label>
+                    <input type="text" id="adversario" name="adversario" placeholder="Ex: Atlético-MG" required>
+                </div>
+                <div>
+                    <label for="golsCruzeiro">Gols do Cruzeiro:</label>
+                    <input type="number" id="golsCruzeiro" name="golsCruzeiro" min="0" required>
+                </div>
+                <div>
+                    <label for="golsAdversario">Gols do Adversário:</label>
+                    <input type="number" id="golsAdversario" name="golsAdversario" min="0" required>
+                </div>
+                <div>
+                    <label for="resultado">Resultado:</label>
+                    <select id="resultado" name="resultado" required>
+                        <option value="vitoria">Vitória</option>
+                        <option value="empate">Empate</option>
+                        <option value="derrota">Derrota</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="avaliacao">Avaliação do Desempenho (1 a 5):</label>
+                    <input type="number" id="avaliacao" name="avaliacao" min="1" max="5">
+                </div>
+                <div>
+                    <label for="observacoes">Observações:</label>
+                    <textarea id="observacoes" name="observacoes" rows="4" placeholder="Como foi o jogo?"></textarea>
+                </div>
+                <button type="submit">Salvar Partida</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Diário Celeste. Desenvolvido para a disciplina de Desenvolvimento Web.</p>
+    </footer>
+    
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
