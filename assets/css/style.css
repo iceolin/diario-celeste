@@ -204,3 +204,165 @@ button:active {
     background-color: var(--azul-escuro);
     box-shadow: 0 4px 10px rgba(0, 51, 153, 0.3);
 }
+
+
+#controles {
+    background-color: var(--branco);
+    padding: 1.5rem 2rem;
+    border-radius: var(--raio-borda);
+    box-shadow: var(--sombra-card);
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 1.25rem;
+    align-items: end;
+}
+
+#controles h2 {
+    grid-column: 1 / -1;
+    margin-bottom: 0.25rem;
+}
+
+#controles div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+
+#controles div:first-of-type {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+}
+
+#controles div:first-of-type label {
+    grid-column: 1 / -1;
+}
+
+#controles button {
+    background-color: var(--azul-claro);
+    color: var(--branco);
+}
+
+#controles button:hover {
+    background-color: var(--azul-escuro);
+}
+
+
+#listagem {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+#listagem article {
+    background-color: var(--branco);
+    padding: 1.5rem;
+    border-radius: var(--raio-borda);
+    box-shadow: var(--sombra-card);
+    border-left: 6px solid var(--azul-cruzeiro);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#listagem article:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 31, 96, 0.14);
+}
+
+#listagem article h3 {
+    color: var(--azul-escuro);
+    font-size: 1.3rem;
+    margin-bottom: 0.25rem;
+}
+
+#listagem article p {
+    color: var(--texto-secundario);
+    font-size: 0.95rem;
+}
+
+#listagem article p strong {
+    color: var(--texto-principal);
+}
+
+
+#listagem article button {
+    margin-top: 0.4rem;
+    padding: 0.6rem 1rem;
+    color: var(--branco);
+}
+
+
+#listagem article button:nth-of-type(1) {
+    background-color: var(--azul-cruzeiro);
+    margin-top: 0.8rem;
+}
+#listagem article button:nth-of-type(1):hover {
+    background-color: var(--azul-escuro);
+}
+
+
+#listagem article button:nth-of-type(2) {
+    background-color: var(--cor-edicao);
+}
+#listagem article button:nth-of-type(2):hover {
+    background-color: #b45309;
+}
+
+
+#listagem article button:nth-of-type(3) {
+    background-color: var(--cor-exclusao);
+}
+#listagem article button:nth-of-type(3):hover {
+    background-color: #b91c1c;
+}
+
+
+#detalhes-item {
+    background-color: var(--azul-gelo);
+    padding: 2rem;
+    border-radius: var(--raio-borda);
+    border: 2px solid var(--azul-claro);
+    box-shadow: var(--sombra-card);
+}
+
+.detalhe-card {
+    background-color: var(--branco);
+    padding: 1.5rem;
+    border-radius: var(--raio-borda);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem 1.5rem;
+}
+
+.detalhe-card h3 {
+    grid-column: 1 / -1;
+    color: var(--azul-cruzeiro);
+    font-size: 1.4rem;
+    border-bottom: 1px solid var(--borda-suave);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+
+.detalhe-card p:last-of-type {
+    grid-column: 1 / -1;
+    background-color: var(--fundo-pagina);
+    padding: 0.75rem;
+    border-radius: var(--raio-borda);
+    border-left: 4px solid var(--cor-sucesso);
+}
+
+.detalhe-card button {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 0.5rem;
+    background-color: var(--texto-secundario);
+    color: var(--branco);
+}
+
+.detalhe-card button:hover {
+    background-color: var(--texto-principal);
+}
