@@ -117,3 +117,90 @@ footer {
     margin-top: 3rem;
     font-size: 0.95rem;
 }
+
+#cadastro {
+    background-color: var(--branco);
+    padding: 2rem;
+    border-radius: var(--raio-borda);
+    box-shadow: var(--sombra-card);
+    border-top: 5px solid var(--azul-cruzeiro);
+}
+
+#cadastro form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+#cadastro form div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+
+#cadastro form div:last-of-type {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-weight: 600;
+    color: var(--texto-principal);
+    font-size: 0.95rem;
+}
+
+input,
+select,
+textarea {
+    padding: 0.75rem;
+    border: 1.5px solid var(--borda-suave);
+    border-radius: var(--raio-borda);
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--texto-principal);
+    background-color: #fcfdff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--azul-claro);
+    background-color: var(--branco);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.25);
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--raio-borda);
+    border: none;
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+button:focus-visible {
+    outline: 3px solid var(--azul-claro);
+    outline-offset: 2px;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+#cadastro form button[type="submit"] {
+    grid-column: 1 / -1;
+    background-color: var(--azul-cruzeiro);
+    color: var(--branco);
+    font-size: 1.05rem;
+    padding: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+#cadastro form button[type="submit"]:hover {
+    background-color: var(--azul-escuro);
+    box-shadow: 0 4px 10px rgba(0, 51, 153, 0.3);
+}
