@@ -178,3 +178,132 @@ function atualizarInterface() {
 detalhesAside.style.display = 'none';
 carregarDados();
 atualizarInterface();
+
+/* =========================================================
+   2. CADASTRO, VALIDAÇÃO E VISUALIZAÇÃO DE DETALHES
+   ========================================================= */
+// Atualiza automaticamente o select de Resultado conforme o placar digitado
+function atualizarResultadoAutomatico() {
+    if (inputGolsCruzeiro.value === '' || inputGolsAdversario.value === '') return;
+    const golsC = parseInt(inputGolsCruzeiro.value, 10);
+    const golsA = parseInt(inputGolsAdversario.value, 10);
+
+    if (golsC > golsA) {
+        selectResultado.value = 'vitoria';
+    } else if (golsC === golsA) {
+        selectResultado.value = 'empate';
+    } else {
+        selectResultado.value = 'derrota';
+    }
+}
+
+inputGolsCruzeiro.addEventListener('input', atualizarResultadoAutomatico);
+inputGolsAdversario.addEventListener('input', atualizarResultadoAutomatico);
+
+// Submissão do formulário (Cadastro e Edição)
+formCadastro.addEventListener('submit', function (evento) {
+    evento.preventDefault();
+
+    const dataJogo = inputDataJogo.value;
+    const campeonato = selectCampeonato.value;
+    const adversario = inputAdversario.value.trim();
+    const golsCruzeiro = parseInt(inputGolsCruzeiro.value, 10);
+    const golsAdversario = parseInt(inputGolsAdversario.value, 10);
+    const avaliacao = inputAvaliacao.value ? parseInt(inputAvaliacao.value, 10) : 5;
+    const observacoes = inputObservacoes.value.trim();
+
+    // Validações
+    if (!dataJogo || !campeonato || !adversario) {
+        mostrarFeedback('Por favor, preencha a data, o campeonato e o time adversário.', 'erro');
+        return;
+    }
+
+    if (isNaN(golsCruzeiro) || golsCruzeiro < 0 || isNaN(golsAdversario) || golsAdversario < 0) {
+        mostrarFeedback('Informe um número válido de gols (maior ou igual a zero).', 'erro');
+        return;
+    }
+
+    if (avaliacao < 1 || avaliacao > 5) {
+        mostrarFeedback('A avaliação de desempenho deve ser uma nota entre 1 e 5.', 'erro');
+        return;
+    }
+
+    // Garante que o resultado condiz com o placar informado
+    let resultadoCalculado = 'empate';
+    if (golsCruzeiro > golsAdversario) resultadoCalculado = 'vitoria';
+    if (golsCruzeiro < golsAdversario) resultadoCalculado = 'derrota';
+    selectResultado.value = resultadoCalculado;
+
+    if (idEmEdicao !== null) {
+        const indice = partidas.findIndex((p) => p.id === idEmEdicao);
+        if (indice !== -1) {
+            partidas[indice] = {
+                ...partidas[indice],
+                dataJogo,
+                campeonato,
+                adversario,
+                golsCruzeiro,
+                golsAdversario,
+                resultado: resultadoCalculado,
+                avaliacao,
+                observacoes: observacoes || 'Sem observações registradas.',
+                estadioApi: dadosApiSelecionados?.estadio || partidas[indice].estadioApi || 'Não informado',
+                paisApi: dadosApiSelecionados?.pais || partidas[indice].paisApi || 'Brasil'
+            };
+        }
+        salvarDados();
+        atualizarInterface();
+        mostrarFeedback(`Partida contra ${adversario} atualizada com sucesso!`);
+        if (typeof cancelarEdicao === 'function') cancelarEdicao();
+    } else {
+        const novaPartida = {
+            id: Date.now(),
+            dataJogo,
+            campeonato,
+            adversario,
+            golsCruzeiro,
+            golsAdversario,
+            resultado: resultadoCalculado,
+            avaliacao,
+            observacoes: observacoes || 'Sem observações registradas.',
+            estadioApi: dadosApiSelecionados?.estadio || 'Mineirão / A definir',
+            paisApi: dadosApiSelecionados?.pais || 'Brasil'
+        };
+
+        partidas.push(novaPartida);
+        salvarDados();
+        atualizarInterface();
+        formCadastro.reset();
+        dadosApiSelecionados = null;
+        mostrarFeedback(`Partida "Cruzeiro ${golsCruzeiro} x ${golsAdversario} ${adversario}" cadastrada com sucesso!`);
+    }
+});
+
+// Exibição de Detalhes de uma Partida
+function verDetalhes(id) {
+    const partida = partidas.find((p) => p.id === id);
+    if (!partida) return;
+
+    const nomeCampeonato = MAPA_CAMPEONATOS[partida.campeonato] || partida.campeonato;
+    const textoResultado = MAPA_RESULTADOS[partida.resultado] || partida.resultado;
+
+    detalheCard.innerHTML = `
+        <h3>Cruzeiro ${partida.golsCruzeiro} x ${partida.golsAdversario} ${partida.adversario}</h3>
+        <p><strong>Data:</strong> ${formatarData(partida.dataJogo)}</p>
+        <p><strong>Campeonato:</strong> ${nomeCampeonato}</p>
+        <p><strong>Gols do Cruzeiro:</strong> ${partida.golsCruzeiro}</p>
+        <p><strong>Gols do Adversário:</strong> ${partida.golsAdversario}</p>
+        <p><strong>Resultado:</strong> ${textoResultado}</p>
+        <p><strong>Avaliação Pessoal:</strong> ${partida.avaliacao} / 5 (${'⭐'.repeat(Number(partida.avaliacao))})</p>
+        <p><strong>Estádio / Origem (API):</strong> ${partida.estadioApi || 'Não informado'} (${partida.paisApi || 'Brasil'})</p>
+        <p><strong>Observações:</strong> ${partida.observacoes}</p>
+        <button type="button" id="btn-fechar-detalhes">Fechar Detalhes</button>
+    `;
+
+    detalhesAside.style.display = 'block';
+    detalhesAside.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    document.getElementById('btn-fechar-detalhes').addEventListener('click', () => {
+        detalhesAside.style.display = 'none';
+    });
+}
