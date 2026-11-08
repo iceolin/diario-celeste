@@ -1,6 +1,3 @@
-/* =========================================================
-   1. ESTADO DA APLICAÇÃO, DADOS INICIAIS E LOCALSTORAGE
-   ========================================================= */
 const STORAGE_KEY = 'diario_celeste_partidas_v1';
 
 const MAPA_CAMPEONATOS = {
@@ -95,7 +92,6 @@ function salvarDados() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(partidas));
 }
 
-// Utilitários de Formatação e Feedback Visual
 function formatarData(dataISO) {
     if (!dataISO) return '';
     const partes = dataISO.split('-');
@@ -130,7 +126,6 @@ function mostrarFeedback(mensagem, tipo = 'sucesso') {
     }, 4500);
 }
 
-// Renderização Dinâmica da Listagem
 function renderizarLista(listaParaExibir = partidas) {
     listagemEl.innerHTML = '';
 
@@ -179,10 +174,7 @@ detalhesAside.style.display = 'none';
 carregarDados();
 atualizarInterface();
 
-/* =========================================================
-   2. CADASTRO, VALIDAÇÃO E VISUALIZAÇÃO DE DETALHES
-   ========================================================= */
-// Atualiza automaticamente o select de Resultado conforme o placar digitado
+
 function atualizarResultadoAutomatico() {
     if (inputGolsCruzeiro.value === '' || inputGolsAdversario.value === '') return;
     const golsC = parseInt(inputGolsCruzeiro.value, 10);
@@ -212,7 +204,6 @@ formCadastro.addEventListener('submit', function (evento) {
     const avaliacao = inputAvaliacao.value ? parseInt(inputAvaliacao.value, 10) : 5;
     const observacoes = inputObservacoes.value.trim();
 
-    // Validações
     if (!dataJogo || !campeonato || !adversario) {
         mostrarFeedback('Por favor, preencha a data, o campeonato e o time adversário.', 'erro');
         return;
@@ -279,7 +270,7 @@ formCadastro.addEventListener('submit', function (evento) {
     }
 });
 
-// Exibição de Detalhes de uma Partida
+
 function verDetalhes(id) {
     const partida = partidas.find((p) => p.id === id);
     if (!partida) return;
@@ -308,9 +299,6 @@ function verDetalhes(id) {
     });
 }
 
-/* =========================================================
-   3. EDIÇÃO E EXCLUSÃO DE PARTIDAS
-   ========================================================= */
 const btnCancelarEdicao = document.createElement('button');
 btnCancelarEdicao.type = 'button';
 btnCancelarEdicao.textContent = 'Cancelar Edição';
@@ -385,10 +373,7 @@ listagemEl.addEventListener('click', function (evento) {
     if (acao === 'excluir') excluirPartida(id);
 });
 
-/* =========================================================
-   4. PESQUISA, FILTROS E ORDENAÇÃO
-   ========================================================= */
-// Garante que todos os campeonatos e critérios de ordenação estejam disponíveis nos selects
+
 function complementarOpcoesDeControle() {
     const opcoesFiltro = [
         { valor: 'todos', texto: 'Todos os Campeonatos' },
@@ -455,9 +440,6 @@ btnBuscar.addEventListener('click', aplicarFiltrosEOrdenacao);
 selectFiltroCampeonato.addEventListener('change', aplicarFiltrosEOrdenacao);
 selectOrdenacao.addEventListener('change', aplicarFiltrosEOrdenacao);
 
-/* =========================================================
-   5. INTEGRAÇÃO COM API PÚBLICA (WIKIPEDIA API - CORRIGIDA)
-   ========================================================= */
 function inicializarIntegracaoApi() {
     const containerAdversario = inputAdversario.parentElement;
 
