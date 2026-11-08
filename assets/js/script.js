@@ -384,3 +384,74 @@ listagemEl.addEventListener('click', function (evento) {
     if (acao === 'editar') prepararEdicao(id);
     if (acao === 'excluir') excluirPartida(id);
 });
+
+/* =========================================================
+   4. PESQUISA, FILTROS E ORDENAÇÃO
+   ========================================================= */
+// Garante que todos os campeonatos e critérios de ordenação estejam disponíveis nos selects
+function complementarOpcoesDeControle() {
+    const opcoesFiltro = [
+        { valor: 'todos', texto: 'Todos os Campeonatos' },
+        { valor: 'Brasileirao', texto: 'Brasileirão Série A' },
+        { valor: 'CopaDoBrasil', texto: 'Copa do Brasil' },
+        { valor: 'Libertadores', texto: 'Copa Libertadores' },
+        { valor: 'Sulamericana', texto: 'Copa Sul-Americana' },
+        { valor: 'Mineiro', texto: 'Campeonato Mineiro' },
+        { valor: 'Amistoso', texto: 'Amistoso' }
+    ];
+    selectFiltroCampeonato.innerHTML = opcoesFiltro
+        .map((op) => `<option value="${op.valor}">${op.texto}</option>`)
+        .join('');
+
+    const opcoesOrdenacao = [
+        { valor: 'recentes', texto: 'Data (Mais recentes)' },
+        { valor: 'antigos', texto: 'Data (Mais antigos)' },
+        { valor: 'avaliacao', texto: 'Melhor Avaliação (5 a 1)' },
+        { valor: 'alfabetica', texto: 'Adversário (A - Z)' }
+    ];
+    selectOrdenacao.innerHTML = opcoesOrdenacao
+        .map((op) => `<option value="${op.valor}">${op.texto}</option>`)
+        .join('');
+}
+
+function aplicarFiltrosEOrdenacao() {
+    const termoPesquisa = inputPesquisa.value.trim().toLowerCase();
+    const campeonatoSelecionado = selectFiltroCampeonato.value;
+    const criterioOrdenacao = selectOrdenacao.value;
+
+    let resultado = partidas.filter((partida) => {
+        const batePesquisa =
+            partida.adversario.toLowerCase().includes(termoPesquisa) ||
+            (partida.observacoes && partida.observacoes.toLowerCase().includes(termoPesquisa));
+
+        const bateCampeonato =
+            campeonatoSelecionado === 'todos' || partida.campeonato === campeonatoSelecionado;
+
+        return batePesquisa && bateCampeonato;
+    });
+
+    resultado.sort((a, b) => {
+        if (criterioOrdenacao === 'recentes') {
+            return b.dataJogo.localeCompare(a.dataJogo);
+        }
+        if (criterioOrdenacao === 'antigos') {
+            return a.dataJogo.localeCompare(b.dataJogo);
+        }
+        if (criterioOrdenacao === 'avaliacao') {
+            return (Number(b.avaliacao) || 0) - (Number(a.avaliacao) || 0);
+        }
+        if (criterioOrdenacao === 'alfabetica') {
+            return a.adversario.localeCompare(b.adversario, 'pt-BR');
+        }
+        return 0;
+    });
+
+    renderizarLista(resultado);
+}
+
+complementarOpcoesDeControle();
+inputPesquisa.addEventListener('input', aplicarFiltrosEOrdenacao);
+btnBuscar.addEventListener('click', aplicarFiltrosEOrdenacao);
+selectFiltroCampeonato.addEventListener('change', aplicarFiltrosEOrdenacao);
+selectOrdenacao.addEventListener('change', aplicarFiltrosEOrdenacao);
+
