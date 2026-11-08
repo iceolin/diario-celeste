@@ -307,3 +307,80 @@ function verDetalhes(id) {
         detalhesAside.style.display = 'none';
     });
 }
+
+/* =========================================================
+   3. EDIÇÃO E EXCLUSÃO DE PARTIDAS
+   ========================================================= */
+const btnCancelarEdicao = document.createElement('button');
+btnCancelarEdicao.type = 'button';
+btnCancelarEdicao.textContent = 'Cancelar Edição';
+btnCancelarEdicao.style.display = 'none';
+btnCancelarEdicao.style.gridColumn = '1 / -1';
+btnCancelarEdicao.style.backgroundColor = '#64748b';
+btnCancelarEdicao.style.color = '#ffffff';
+formCadastro.appendChild(btnCancelarEdicao);
+
+function prepararEdicao(id) {
+    const partida = partidas.find((p) => p.id === id);
+    if (!partida) return;
+
+    idEmEdicao = partida.id;
+    inputDataJogo.value = partida.dataJogo;
+    selectCampeonato.value = partida.campeonato;
+    inputAdversario.value = partida.adversario;
+    inputGolsCruzeiro.value = partida.golsCruzeiro;
+    inputGolsAdversario.value = partida.golsAdversario;
+    selectResultado.value = partida.resultado;
+    inputAvaliacao.value = partida.avaliacao;
+    inputObservacoes.value = partida.observacoes === 'Sem observações registradas.' ? '' : partida.observacoes;
+
+    tituloCadastro.textContent = `Editando: Cruzeiro x ${partida.adversario}`;
+    btnSubmit.textContent = 'Atualizar Partida';
+    btnCancelarEdicao.style.display = 'block';
+
+    secaoCadastro.scrollIntoView({ behavior: 'smooth' });
+    mostrarFeedback(`Modo de edição ativado para a partida contra ${partida.adversario}.`);
+}
+
+function cancelarEdicao() {
+    idEmEdicao = null;
+    dadosApiSelecionados = null;
+    formCadastro.reset();
+    tituloCadastro.textContent = 'Registrar Nova Partida';
+    btnSubmit.textContent = 'Salvar Partida';
+    btnCancelarEdicao.style.display = 'none';
+}
+
+btnCancelarEdicao.addEventListener('click', cancelarEdicao);
+
+function excluirPartida(id) {
+    const partida = partidas.find((p) => p.id === id);
+    if (!partida) return;
+
+    const confirmou = window.confirm(
+        `Tem certeza que deseja excluir a partida "Cruzeiro ${partida.golsCruzeiro} x ${partida.golsAdversario} ${partida.adversario}"?`
+    );
+
+    if (!confirmou) return;
+
+    partidas = partidas.filter((p) => p.id !== id);
+    salvarDados();
+    atualizarInterface();
+
+    if (idEmEdicao === id) cancelarEdicao();
+    detalhesAside.style.display = 'none';
+    mostrarFeedback('Partida excluída com sucesso!');
+}
+
+// Delegação de eventos para os botões de cada card na listagem
+listagemEl.addEventListener('click', function (evento) {
+    const botao = evento.target.closest('button[data-acao]');
+    if (!botao) return;
+
+    const acao = botao.getAttribute('data-acao');
+    const id = Number(botao.getAttribute('data-id'));
+
+    if (acao === 'detalhes') verDetalhes(id);
+    if (acao === 'editar') prepararEdicao(id);
+    if (acao === 'excluir') excluirPartida(id);
+});
