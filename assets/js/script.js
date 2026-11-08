@@ -456,7 +456,7 @@ selectFiltroCampeonato.addEventListener('change', aplicarFiltrosEOrdenacao);
 selectOrdenacao.addEventListener('change', aplicarFiltrosEOrdenacao);
 
 /* =========================================================
-   5. INTEGRAÇÃO COM API PÚBLICA (THESPORTSDB / WIKIPEDIA API)
+   5. INTEGRAÇÃO COM API PÚBLICA (WIKIPEDIA API - CORRIGIDA)
    ========================================================= */
 function inicializarIntegracaoApi() {
     const containerAdversario = inputAdversario.parentElement;
@@ -507,38 +507,23 @@ function inicializarIntegracaoApi() {
         listaResultadosApi.innerHTML = '';
 
         try {
-            const urlSportsDb = `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(termo)}`;
-            const resposta = await fetch(urlSportsDb);
+            // Utilizando a API da Wikipédia (100% pública e sem bloqueios de CORS)
+            const urlWiki = `https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(termo + ' esporte clube futebol')}&utf8=&format=json&origin=*`;
+            const resposta = await fetch(urlWiki);
+            
+            if (!resposta.ok) throw new Error('Erro na rede');
+            
             const dados = await resposta.json();
-
             let clubesEncontrados = [];
 
-            if (dados && Array.isArray(dados.teams)) {
-                clubesEncontrados = dados.teams
-                    .filter((t) => !t.strSport || t.strSport === 'Soccer')
-                    .slice(0, 4)
-                    .map((t) => ({
-                        nome: t.strTeam,
-                        estadio: t.strStadium || 'Estádio não informado',
-                        pais: t.strCountry || 'Internacional',
-                        resumo: `Clube de futebol (${t.strCountry || ' Oficial'}) — Estádio: ${t.strStadium || 'N/D'}`
-                    }));
-            }
-
-            // Fallback com API pública da Wikipédia caso o clube não conste na listagem da TheSportsDB
-            if (clubesEncontrados.length === 0) {
-                const urlWiki = `https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(termo + ' futebol clube')}&utf8=&format=json&origin=*`;
-                const respWiki = await fetch(urlWiki);
-                const dadosWiki = await respWiki.json();
-
-                if (dadosWiki?.query?.search?.length > 0) {
-                    clubesEncontrados = dadosWiki.query.search.slice(0, 3).map((item) => ({
-                        nome: item.title.replace(/\(.*\)/, '').trim(),
-                        estadio: 'Consultado via API Wikipédia',
-                        pais: 'Brasil / Internacional',
-                        resumo: item.snippet.replace(/<\/?[^>]+(>|$)/g, '')
-                    }));
-                }
+            if (dados?.query?.search?.length > 0) {
+                // Filtra os 3 primeiros resultados
+                clubesEncontrados = dados.query.search.slice(0, 3).map((item) => ({
+                    nome: item.title.replace(/\(.*\)/, '').trim(),
+                    estadio: 'Informação importada da Wikipédia',
+                    pais: 'Brasil / Internacional',
+                    resumo: item.snippet.replace(/<\/?[^>]+(>|$)/g, '')
+                }));
             }
 
             if (clubesEncontrados.length === 0) {
@@ -563,7 +548,7 @@ function inicializarIntegracaoApi() {
 
                 const infoTexto = document.createElement('span');
                 infoTexto.style.fontSize = '0.85rem';
-                infoTexto.innerHTML = `<strong>${clube.nome}</strong> (${clube.pais})<br><small>${clube.estadio}</small>`;
+                infoTexto.innerHTML = `<strong>${clube.nome}</strong><br><small>${clube.estadio}</small>`;
 
                 const btnSelecionar = document.createElement('button');
                 btnSelecionar.type = 'button';
@@ -576,15 +561,15 @@ function inicializarIntegracaoApi() {
                 btnSelecionar.addEventListener('click', () => {
                     inputAdversario.value = clube.nome;
                     dadosApiSelecionados = {
-                        estadio: clube.estadio,
-                        pais: clube.pais
+                        estadio: 'Consulta API Wikipédia',
+                        pais: 'Brasil'
                     };
                     if (!inputObservacoes.value.trim()) {
-                        inputObservacoes.value = `Adversário importado via API (${clube.nome} - Estádio: ${clube.estadio}).`;
+                        inputObservacoes.value = `Adversário validado e importado via API da Wikipédia (${clube.nome}).`;
                     }
                     listaResultadosApi.style.display = 'none';
                     statusApi.textContent = `✔ ${clube.nome} selecionado!`;
-                    mostrarFeedback(`Dados do clube "${clube.nome}" importados da API para o formulário!`);
+                    mostrarFeedback(`Dados de "${clube.nome}" importados da API para o formulário!`);
                 });
 
                 itemDiv.appendChild(infoTexto);
@@ -592,6 +577,7 @@ function inicializarIntegracaoApi() {
                 listaResultadosApi.appendChild(itemDiv);
             });
         } catch (erro) {
+            console.error(erro);
             statusApi.textContent = 'Erro ao consultar a API.';
             mostrarFeedback('Não foi possível conectar à API pública no momento.', 'erro');
         } finally {
