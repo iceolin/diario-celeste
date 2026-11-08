@@ -455,3 +455,149 @@ btnBuscar.addEventListener('click', aplicarFiltrosEOrdenacao);
 selectFiltroCampeonato.addEventListener('change', aplicarFiltrosEOrdenacao);
 selectOrdenacao.addEventListener('change', aplicarFiltrosEOrdenacao);
 
+/* =========================================================
+   5. INTEGRAÇÃO COM API PÚBLICA (THESPORTSDB / WIKIPEDIA API)
+   ========================================================= */
+function inicializarIntegracaoApi() {
+    const containerAdversario = inputAdversario.parentElement;
+
+    const barraApi = document.createElement('div');
+    barraApi.style.display = 'flex';
+    barraApi.style.gap = '0.5rem';
+    barraApi.style.marginTop = '0.35rem';
+
+    const btnConsultarApi = document.createElement('button');
+    btnConsultarApi.type = 'button';
+    btnConsultarApi.textContent = '🌐 Buscar Clube na API';
+    btnConsultarApi.style.backgroundColor = '#0052cc';
+    btnConsultarApi.style.color = '#ffffff';
+    btnConsultarApi.style.padding = '0.45rem 0.85rem';
+    btnConsultarApi.style.fontSize = '0.85rem';
+
+    const statusApi = document.createElement('span');
+    statusApi.style.fontSize = '0.85rem';
+    statusApi.style.color = '#475569';
+    statusApi.style.alignSelf = 'center';
+
+    const listaResultadosApi = document.createElement('div');
+    listaResultadosApi.id = 'resultados-api';
+    listaResultadosApi.style.display = 'none';
+    listaResultadosApi.style.marginTop = '0.5rem';
+    listaResultadosApi.style.padding = '0.75rem';
+    listaResultadosApi.style.backgroundColor = '#eef4ff';
+    listaResultadosApi.style.borderRadius = '8px';
+    listaResultadosApi.style.border = '1px solid #cbd5e1';
+
+    barraApi.appendChild(btnConsultarApi);
+    barraApi.appendChild(statusApi);
+    containerAdversario.appendChild(barraApi);
+    containerAdversario.appendChild(listaResultadosApi);
+
+    btnConsultarApi.addEventListener('click', async () => {
+        const termo = inputAdversario.value.trim();
+        if (!termo) {
+            mostrarFeedback('Digite o nome de um clube no campo "Time Adversário" antes de buscar na API.', 'erro');
+            inputAdversario.focus();
+            return;
+        }
+
+        statusApi.textContent = 'Consultando API...';
+        btnConsultarApi.disabled = true;
+        listaResultadosApi.style.display = 'none';
+        listaResultadosApi.innerHTML = '';
+
+        try {
+            const urlSportsDb = `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(termo)}`;
+            const resposta = await fetch(urlSportsDb);
+            const dados = await resposta.json();
+
+            let clubesEncontrados = [];
+
+            if (dados && Array.isArray(dados.teams)) {
+                clubesEncontrados = dados.teams
+                    .filter((t) => !t.strSport || t.strSport === 'Soccer')
+                    .slice(0, 4)
+                    .map((t) => ({
+                        nome: t.strTeam,
+                        estadio: t.strStadium || 'Estádio não informado',
+                        pais: t.strCountry || 'Internacional',
+                        resumo: `Clube de futebol (${t.strCountry || ' Oficial'}) — Estádio: ${t.strStadium || 'N/D'}`
+                    }));
+            }
+
+            // Fallback com API pública da Wikipédia caso o clube não conste na listagem da TheSportsDB
+            if (clubesEncontrados.length === 0) {
+                const urlWiki = `https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(termo + ' futebol clube')}&utf8=&format=json&origin=*`;
+                const respWiki = await fetch(urlWiki);
+                const dadosWiki = await respWiki.json();
+
+                if (dadosWiki?.query?.search?.length > 0) {
+                    clubesEncontrados = dadosWiki.query.search.slice(0, 3).map((item) => ({
+                        nome: item.title.replace(/\(.*\)/, '').trim(),
+                        estadio: 'Consultado via API Wikipédia',
+                        pais: 'Brasil / Internacional',
+                        resumo: item.snippet.replace(/<\/?[^>]+(>|$)/g, '')
+                    }));
+                }
+            }
+
+            if (clubesEncontrados.length === 0) {
+                statusApi.textContent = 'Nenhum clube encontrado na API.';
+                return;
+            }
+
+            statusApi.textContent = `${clubesEncontrados.length} resultado(s) na API:`;
+            listaResultadosApi.style.display = 'flex';
+            listaResultadosApi.style.flexDirection = 'column';
+            listaResultadosApi.style.gap = '0.5rem';
+
+            clubesEncontrados.forEach((clube) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.style.display = 'flex';
+                itemDiv.style.justifyContent = 'space-between';
+                itemDiv.style.alignItems = 'center';
+                itemDiv.style.gap = '0.5rem';
+                itemDiv.style.backgroundColor = '#ffffff';
+                itemDiv.style.padding = '0.5rem 0.75rem';
+                itemDiv.style.borderRadius = '6px';
+
+                const infoTexto = document.createElement('span');
+                infoTexto.style.fontSize = '0.85rem';
+                infoTexto.innerHTML = `<strong>${clube.nome}</strong> (${clube.pais})<br><small>${clube.estadio}</small>`;
+
+                const btnSelecionar = document.createElement('button');
+                btnSelecionar.type = 'button';
+                btnSelecionar.textContent = 'Selecionar';
+                btnSelecionar.style.backgroundColor = '#15803d';
+                btnSelecionar.style.color = '#ffffff';
+                btnSelecionar.style.padding = '0.35rem 0.7rem';
+                btnSelecionar.style.fontSize = '0.8rem';
+
+                btnSelecionar.addEventListener('click', () => {
+                    inputAdversario.value = clube.nome;
+                    dadosApiSelecionados = {
+                        estadio: clube.estadio,
+                        pais: clube.pais
+                    };
+                    if (!inputObservacoes.value.trim()) {
+                        inputObservacoes.value = `Adversário importado via API (${clube.nome} - Estádio: ${clube.estadio}).`;
+                    }
+                    listaResultadosApi.style.display = 'none';
+                    statusApi.textContent = `✔ ${clube.nome} selecionado!`;
+                    mostrarFeedback(`Dados do clube "${clube.nome}" importados da API para o formulário!`);
+                });
+
+                itemDiv.appendChild(infoTexto);
+                itemDiv.appendChild(btnSelecionar);
+                listaResultadosApi.appendChild(itemDiv);
+            });
+        } catch (erro) {
+            statusApi.textContent = 'Erro ao consultar a API.';
+            mostrarFeedback('Não foi possível conectar à API pública no momento.', 'erro');
+        } finally {
+            btnConsultarApi.disabled = false;
+        }
+    });
+}
+
+inicializarIntegracaoApi();
